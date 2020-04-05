@@ -1,0 +1,190 @@
+---
+# Source: pihole/templates/secret.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: pihole-password
+  labels:
+    app: pihole
+    chart: pihole-1.3.2
+    heritage: Helm
+    release: pihole
+type: Opaque
+data:
+  password: "YWRtaW4="
+---
+# Source: pihole/templates/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pihole-custom-dnsmasq
+  labels:
+    app: pihole
+    chart: pihole-1.3.2
+    release: pihole
+    heritage: Helm
+data:
+  02-custom.conf: |
+    addn-hosts=/etc/addn-hosts
+  addn-hosts: |
+---
+# Source: pihole/templates/service-tcp.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: pihole-tcp
+  labels:
+    app: pihole
+    chart: pihole-1.3.2
+    release: pihole
+    heritage: Helm
+  annotations:
+    metallb.universe.tf/address-pool: default
+    metallb.universe.tf/allow-shared-ip: pihole-svc
+spec:
+  type: LoadBalancer
+  loadBalancerIP: 192.168.1.241
+  externalTrafficPolicy: Local
+  ports:
+    - port: 80
+      targetPort: http
+      protocol: TCP
+      name: http
+    - port: 443
+      targetPort: https
+      protocol: TCP
+      name: https
+    - port: 53
+      targetPort: dns
+      protocol: TCP
+      name: dns
+  selector:
+    app: pihole
+    release: pihole
+---
+# Source: pihole/templates/service-udp.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: pihole-udp
+  labels:
+    app: pihole
+    chart: pihole-1.3.2
+    release: pihole
+    heritage: Helm
+  annotations:
+    metallb.universe.tf/address-pool: network-services
+    metallb.universe.tf/allow-shared-ip: pihole-svc
+spec:
+  type: LoadBalancer
+  loadBalancerIP: 192.168.1.241
+  externalTrafficPolicy: Local
+  ports:
+    - port: 53
+      targetPort: dns-udp
+      protocol: UDP
+      name: dns-udp
+    - port: 67
+      targetPort: client-udp
+      protocol: UDP
+      name: client-udp
+  selector:
+    app: pihole
+    release: pihole
+---
+# Source: pihole/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pihole
+  labels:
+    app: pihole
+    chart: pihole-1.3.2
+    release: pihole
+    heritage: Helm
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: pihole
+      release: pihole
+  template:
+    metadata:
+      labels:
+        app: pihole
+        release: pihole
+    spec:
+      dnsPolicy: "None"
+      dnsConfig:
+        nameservers:
+        - 127.0.0.1
+        - 8.8.8.8 
+      containers:
+        - name: pihole
+          env:
+          - name: WEBPASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: password
+                name: pihole-password
+          - name: 'DNS1'
+            value: 8.8.8.8
+          - name: 'DNS2'
+            value: 8.8.4.4
+          image: "pihole/pihole:4.3.2-1"
+          imagePullPolicy: IfNotPresent
+          ports:
+          - containerPort: 80
+            name: http
+            protocol: TCP
+          - containerPort: 53
+            name: dns
+            protocol: TCP
+          - containerPort: 53
+            name: dns-udp
+            protocol: UDP
+          - containerPort: 443
+            name: https
+            protocol: TCP
+          - containerPort: 67
+            name: client-udp
+            protocol: UDP
+          livenessProbe:
+            httpGet:
+              path: /admin.index.php
+              port: http
+            initialDelaySeconds: 60
+            failureThreshold: 10
+            timeoutSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /admin.index.php
+              port: http
+            initialDelaySeconds: 60
+            failureThreshold: 3
+            timeoutSeconds: 5
+          volumeMounts:
+          - mountPath: /etc/pihole
+            name: pihole-nfs
+          - mountPath: /etc/dnsmasq.d/02-custom.conf
+            name: custom-dnsmasq
+            subPath: 02-custom.conf
+          - mountPath: /etc/addn-hosts
+            name: custom-dnsmasq
+            subPath: addn-hosts
+          resources:
+            {}
+      volumes:
+      - name: pihole-nfs
+        persistentVolumeClaim:
+          claimName: pihole-claim
+      - configMap:
+          defaultMode: 420
+          name: pihole-custom-dnsmasq
+        name: custom-dnsmasq
+
