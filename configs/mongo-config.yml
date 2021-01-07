@@ -1,0 +1,52 @@
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: unifi-mongo
+spec:
+  replicas: 1
+  serviceName: unifi-mongo
+  #strategy:
+  #  type: RollingUpdate
+  #  rollingUpdate:
+  #    maxSurge: 1
+  #    maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: unifi-mongo
+  template:
+    metadata:
+      labels:
+        app: unifi-mongo
+    spec:
+      containers:
+        - name: unifi-mongo
+          env:
+            - name: MONGO_INIT_DB_ROOT_USERNAME
+              value: mongoadmin
+            - name: MONGO_INIT_DB_ROOT_PASSWORD
+              value: mongopassword
+          image: "mongo"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 27017
+              name: "mongo"
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /data/db
+              name: unifi-mongo
+      #volumes:
+      #- name: unifi-nfs
+      #  persistentVolumeClaim:
+      #    claimName: unifi-claim
+  volumeClaimTemplates:
+    - metadata:
+        name: unifi-mongo
+      spec:
+        storageClassName: "managed-nfs-storage"
+        accessModes: [ ReadWriteOnce ]
+        resources:
+          requests:
+            storage: 10Gi
+
+

@@ -1,0 +1,81 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gitlab-tcp
+  labels:
+    app: gitlab
+  annotations:
+    metallb.universe.tf/address-pool: default
+spec:
+  type: LoadBalancer
+  loadBalancerIP: 192.168.1.246
+  externalTrafficPolicy: Local
+  ports:
+    - port: 80
+      targetPort: http
+      protocol: TCP
+      name: http
+    - port: 443
+      targetPort: https
+      protocol: TCP
+      name: https
+    - port: 22
+      targetPort: ssh
+      protocol: TCP
+      name: ssh
+  selector:
+    app: gitlab
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gitlab
+  labels:
+    app: gitlab
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: gitlab
+  template:
+    metadata:
+      labels:
+        app: gitlab
+    spec:
+      containers:
+        - name: gitlab
+          image: "ulm0/gitlab"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80
+              name: http
+              protocol: TCP
+            - containerPort: 443
+              name: https
+              protocol: TCP
+            - containerPort: 22
+              name: ssh
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /etc/gitlab
+              name: gitlab-nfs-etc
+            - mountPath: /var/log/gitlab
+              name: gitlab-nfs-log
+            - mountPath: /var/opt/gitlab
+              name: gitlab-nfs-opt
+      volumes:
+        - name: gitlab-nfs-etc
+          persistentVolumeClaim:
+            claimName: gitlab-claim-etc
+        - name: gitlab-nfs-log
+          persistentVolumeClaim:
+            claimName: gitlab-claim-log
+        - name: gitlab-nfs-opt
+          persistentVolumeClaim:
+            claimName: gitlab-claim-opt
