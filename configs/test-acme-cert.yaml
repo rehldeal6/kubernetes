@@ -1,0 +1,13 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: rehl-xyz
+  namespace: default
+spec:
+  secretName: rehl-xyz-tls # replace with your-domain-tls
+  issuerRef:
+    name: acme-staging
+    kind: ClusterIssuer
+  commonName: rehl.xyz # replace with your-domain
+  dnsNames:
+    - rehl.xyz # replace with your-domain

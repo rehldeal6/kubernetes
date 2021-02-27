@@ -1,0 +1,86 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ha
+  labels:
+    app: ha
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: ha
+  template:
+    metadata:
+      labels:
+        app: ha
+    spec:
+      containers:
+        - name: homeassistant
+          image: "homeassistant/home-assistant:stable"
+          imagePullPolicy: IfNotPresent
+          ports:
+          - containerPort: 8123
+            name: web
+            protocol: TCP
+          env:
+          - name: "TZ"
+            value: "America/New_York"
+          volumeMounts:
+          - mountPath: /config
+            name: ha-nfs
+      volumes:
+      - name: ha-nfs
+        persistentVolumeClaim:
+          claimName: ha-claim
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ha-tcp
+  labels:
+    app: ha
+  annotations:
+    metallb.universe.tf/address-pool: default
+spec:
+  type: LoadBalancer
+  loadBalancerIP: 192.168.1.244
+  externalTrafficPolicy: Local
+  ports:
+    - port: 80
+      targetPort: web
+      protocol: TCP
+      name: web
+  selector:
+    app: ha
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ha-ingress
+  annotations:
+    kubernetes.io/ingress.class: "traefik"
+    cert-manager.io/cluster-issuer: acme-prod
+spec:
+  rules:
+    - host: ha.rehl.xyz
+      http:
+        paths:
+          - pathType: Prefix
+            path: "/"
+            backend:
+              service:
+                name: ha-tcp
+                port:
+                  number: 80
+  tls:
+    - hosts:
+        - ha.rehl.xyz
+      secretName: ha-rehl-xyz-tls

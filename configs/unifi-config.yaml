@@ -1,4 +1,57 @@
 ---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: unificontroller
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: unificontroller
+  template:
+    metadata:
+      labels:
+        app: unificontroller
+    spec:
+      containers:
+        - name: unificontroller
+          env:
+            - name: TZ
+              value: "America/New_York"
+          image: "jacobalberty/unifi"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: "device-cc"
+              containerPort: 8080
+              protocol: TCP
+            - name: "web-api"
+              containerPort: 8443
+              protocol: TCP
+            - name: "https-portal"
+              containerPort: 8843
+              protocol: TCP
+            - name: "http-portal"
+              containerPort: 8880
+              protocol: TCP
+            - name: "stun-service"
+              containerPort: 3478
+              protocol: UDP
+            - name: "speed-test"
+              containerPort: 6789
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /unifi
+              name: unifi-nfs
+      volumes:
+      - name: unifi-nfs
+        persistentVolumeClaim:
+          claimName: unifi-claim
+---
 apiVersion: v1
 kind: Service
 metadata:
@@ -10,17 +63,13 @@ spec:
   type: LoadBalancer
   loadBalancerIP: 192.168.1.242
   ports:
-    - port: 80
-      targetPort: 8080
-      protocol: TCP
-      name: "http"
     - port: 8080
       protocol: TCP
-      name: "http-default"
+      name: "device-cc"
     - port: 443
-      targetPort: 8443
+      targetPort: "web-api"
       protocol: TCP
-      name: "https"
+      name: "web-api"
     - port: 8443
       protocol: TCP
       name: "https-default"
@@ -54,65 +103,26 @@ spec:
   selector:
     app: unificontroller
 ---
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: networking.k8s.io/v1
+kind: Ingress
 metadata:
-  name: unificontroller
+  name: unifi-ingress
+  annotations:
+    kubernetes.io/ingress.class: "traefik"
+    cert-manager.io/cluster-issuer: acme-prod
 spec:
-  replicas: 1
-  strategy:
-    type: RollingUpdate
-    rollingUpdate:
-      maxSurge: 1
-      maxUnavailable: 1
-  selector:
-    matchLabels:
-      app: unificontroller
-  template:
-    metadata:
-      labels:
-        app: unificontroller
-    spec:
-      containers:
-        - name: unificontroller
-          env:
-            #- name: UNIFI_HTTP_PORT
-            #  value: "80"
-            #- name: UNIFI_HTTPS_PORT
-            #  value: "443"
-            - name: TZ
-              value: "America/New_York"
-              #- name: DB_URI
-              #  value: "mongodb://mongoadmin:mongopassword@10.1.7.13:27017/unifi"
-              # - name: STATDB_URI
-              #  value: "mongodb:///mongoadmin:mongopassword@10.1.7.13:27017/unifi_stat"
-              #- name: DB_NAME
-              # value: "unifi"
-          image: "jacobalberty/unifi"
-          imagePullPolicy: IfNotPresent
-          ports:
-            - name: "http-port"
-              containerPort: 8080
-              protocol: TCP
-            - name: "https-port"
-              containerPort: 8443
-              protocol: TCP
-            - name: "https-portal"
-              containerPort: 8843
-              protocol: TCP
-            - name: "http-portal"
-              containerPort: 8880
-              protocol: TCP
-            - name: "stun-service"
-              containerPort: 3478
-              protocol: UDP
-            - name: "speed-test"
-              containerPort: 6789
-              protocol: TCP
-          volumeMounts:
-            - mountPath: /unifi
-              name: unifi-nfs
-      volumes:
-      - name: unifi-nfs
-        persistentVolumeClaim:
-          claimName: unifi-claim
+  rules:
+    - host: unifi.rehl.xyz
+      http:
+        paths:
+          - pathType: Prefix
+            path: "/"
+            backend:
+              service:
+                name: unifi-tcp
+                port:
+                  number: 443
+  tls:
+    - hosts:
+        - unifi.rehl.xyz
+      secretName: unifi-rehl-xyz-tls
