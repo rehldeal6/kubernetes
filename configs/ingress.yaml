@@ -1,0 +1,29 @@
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+  name: default-ingress
+  namespace: default
+spec:
+  rules:
+    - host: unifi.rehl.xyz
+      http:
+        paths:
+          - backend:
+              serviceName: unifi-tcp
+              servicePort: 8080
+            path: /
+    - host: ha.rehl.xyz
+      http:
+        paths:
+          - backend:
+              serviceName: ha-tcp
+              servicePort: 8123
+            path: /
+  tls:
+    - hosts:
+        - ha.rehl.xyz
+        - unifi.rehl.xyz
+      secretName: rehl-tls

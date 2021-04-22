@@ -56,5 +56,8 @@ spec:
             name: ha-nfs
       volumes:
       - name: ha-nfs
-        persistentVolumeClaim:
-          claimName: ha-claim
+        #persistentVolumeClaim:
+        #  claimName: ha-claim
+        nfs:
+          server: rehlnas
+          path: /nfs/k8s
