@@ -3,9 +3,9 @@ kind: PersistentVolumeClaim
 metadata:
   name: ha-claim
 spec:
+  storageClassName: cephfs
   accessModes:
     - ReadWriteMany
   resources:
-    storageClassName: cephfs
     requests:
       storage: 5Gi
