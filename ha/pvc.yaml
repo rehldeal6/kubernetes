@@ -1,10 +1,10 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: pihole-claim
-  annotations:
-    volume.beta.kubernetes.io/storage-class: "nfs-client"
+  name: ha-claim
+  namespace: ha
 spec:
+  storageClassName: nfs-client
   accessModes:
     - ReadWriteMany
   resources:

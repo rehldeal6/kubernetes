@@ -3,10 +3,11 @@ kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
   name: unifi-claim
+  namespace: unifi
 spec:
   accessModes:
     - "ReadWriteMany"
-  storageClassName: cephfs
+  storageClassName: nfs-client
   resources:
     requests:
       storage: "10Gi"
