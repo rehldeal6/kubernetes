@@ -1,0 +1,11 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: longhorn-certificate
+  namespace: longhorn-system
+spec:
+  secretName: tls-longhorn
+  issuerRef:
+    name: letsencrypt-staging
+  dnsNames:
+    - longhorn.rehl.xyz

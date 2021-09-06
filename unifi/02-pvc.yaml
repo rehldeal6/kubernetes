@@ -6,8 +6,8 @@ metadata:
   namespace: unifi
 spec:
   accessModes:
-    - "ReadWriteMany"
-  storageClassName: nfs-client
+    - ReadWriteMany
+  storageClassName: longhorn
   resources:
     requests:
-      storage: "10Gi"
+      storage: 10Gi

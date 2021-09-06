@@ -1,0 +1,547 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.22.0 (955b78124)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: mailserver
+  name: mailserver
+  namespace: mail
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: mailserver
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert
+        kompose.version: 1.22.0 (955b78124)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: mailserver
+    spec:
+      containers:
+        - env:
+            - name: AMAVIS_LOGLEVEL
+              valueFrom:
+                configMapKeyRef:
+                  key: AMAVIS_LOGLEVEL
+                  name: mailserver-env
+            - name: DEFAULT_RELAY_HOST
+              valueFrom:
+                configMapKeyRef:
+                  key: DEFAULT_RELAY_HOST
+                  name: mailserver-env
+            - name: DMS_DEBUG
+              valueFrom:
+                configMapKeyRef:
+                  key: DMS_DEBUG
+                  name: mailserver-env
+            - name: DOVECOT_AUTH_BIND
+              valueFrom:
+                configMapKeyRef:
+                  key: DOVECOT_AUTH_BIND
+                  name: mailserver-env
+            - name: DOVECOT_MAILBOX_FORMAT
+              valueFrom:
+                configMapKeyRef:
+                  key: DOVECOT_MAILBOX_FORMAT
+                  name: mailserver-env
+            - name: DOVECOT_PASS_FILTER
+              valueFrom:
+                configMapKeyRef:
+                  key: DOVECOT_PASS_FILTER
+                  name: mailserver-env
+            - name: DOVECOT_TLS
+              valueFrom:
+                configMapKeyRef:
+                  key: DOVECOT_TLS
+                  name: mailserver-env
+            - name: DOVECOT_USER_FILTER
+              valueFrom:
+                configMapKeyRef:
+                  key: DOVECOT_USER_FILTER
+                  name: mailserver-env
+            - name: ENABLE_AMAVIS
+              valueFrom:
+                configMapKeyRef:
+                  key: ENABLE_AMAVIS
+                  name: mailserver-env
+            - name: ENABLE_CLAMAV
+              valueFrom:
+                configMapKeyRef:
+                  key: ENABLE_CLAMAV
+                  name: mailserver-env
+            - name: ENABLE_FAIL2BAN
+              valueFrom:
+                configMapKeyRef:
+                  key: ENABLE_FAIL2BAN
+                  name: mailserver-env
+            - name: ENABLE_FETCHMAIL
+              valueFrom:
+                configMapKeyRef:
+                  key: ENABLE_FETCHMAIL
+                  name: mailserver-env
+            - name: ENABLE_LDAP
+              valueFrom:
+                configMapKeyRef:
+                  key: ENABLE_LDAP
+                  name: mailserver-env
+            - name: ENABLE_MANAGESIEVE
+              valueFrom:
+                configMapKeyRef:
+                  key: ENABLE_MANAGESIEVE
+                  name: mailserver-env
+            - name: ENABLE_POP3
+              valueFrom:
+                configMapKeyRef:
+                  key: ENABLE_POP3
+                  name: mailserver-env
+            - name: ENABLE_POSTFIX_VIRTUAL_TRANSPORT
+              valueFrom:
+                configMapKeyRef:
+                  key: ENABLE_POSTFIX_VIRTUAL_TRANSPORT
+                  name: mailserver-env
+            - name: ENABLE_POSTGREY
+              valueFrom:
+                configMapKeyRef:
+                  key: ENABLE_POSTGREY
+                  name: mailserver-env
+            - name: ENABLE_QUOTAS
+              valueFrom:
+                configMapKeyRef:
+                  key: ENABLE_QUOTAS
+                  name: mailserver-env
+            - name: ENABLE_SASLAUTHD
+              valueFrom:
+                configMapKeyRef:
+                  key: ENABLE_SASLAUTHD
+                  name: mailserver-env
+            - name: ENABLE_SPAMASSASSIN
+              valueFrom:
+                configMapKeyRef:
+                  key: ENABLE_SPAMASSASSIN
+                  name: mailserver-env
+            - name: ENABLE_SRS
+              valueFrom:
+                configMapKeyRef:
+                  key: ENABLE_SRS
+                  name: mailserver-env
+            - name: ENABLE_UPDATE_CHECK
+              valueFrom:
+                configMapKeyRef:
+                  key: ENABLE_UPDATE_CHECK
+                  name: mailserver-env
+            - name: FAIL2BAN_BLOCKTYPE
+              valueFrom:
+                configMapKeyRef:
+                  key: FAIL2BAN_BLOCKTYPE
+                  name: mailserver-env
+            - name: FETCHMAIL_POLL
+              valueFrom:
+                configMapKeyRef:
+                  key: FETCHMAIL_POLL
+                  name: mailserver-env
+            - name: LDAP_BIND_DN
+              valueFrom:
+                configMapKeyRef:
+                  key: LDAP_BIND_DN
+                  name: mailserver-env
+            - name: LDAP_BIND_PW
+              valueFrom:
+                configMapKeyRef:
+                  key: LDAP_BIND_PW
+                  name: mailserver-env
+            - name: LDAP_QUERY_FILTER_ALIAS
+              valueFrom:
+                configMapKeyRef:
+                  key: LDAP_QUERY_FILTER_ALIAS
+                  name: mailserver-env
+            - name: LDAP_QUERY_FILTER_DOMAIN
+              valueFrom:
+                configMapKeyRef:
+                  key: LDAP_QUERY_FILTER_DOMAIN
+                  name: mailserver-env
+            - name: LDAP_QUERY_FILTER_GROUP
+              valueFrom:
+                configMapKeyRef:
+                  key: LDAP_QUERY_FILTER_GROUP
+                  name: mailserver-env
+            - name: LDAP_QUERY_FILTER_USER
+              valueFrom:
+                configMapKeyRef:
+                  key: LDAP_QUERY_FILTER_USER
+                  name: mailserver-env
+            - name: LDAP_SEARCH_BASE
+              valueFrom:
+                configMapKeyRef:
+                  key: LDAP_SEARCH_BASE
+                  name: mailserver-env
+            - name: LDAP_SERVER_HOST
+              valueFrom:
+                configMapKeyRef:
+                  key: LDAP_SERVER_HOST
+                  name: mailserver-env
+            - name: LDAP_START_TLS
+              valueFrom:
+                configMapKeyRef:
+                  key: LDAP_START_TLS
+                  name: mailserver-env
+            - name: LOGWATCH_INTERVAL
+              valueFrom:
+                configMapKeyRef:
+                  key: LOGWATCH_INTERVAL
+                  name: mailserver-env
+            - name: LOGWATCH_RECIPIENT
+              valueFrom:
+                configMapKeyRef:
+                  key: LOGWATCH_RECIPIENT
+                  name: mailserver-env
+            - name: MOVE_SPAM_TO_JUNK
+              valueFrom:
+                configMapKeyRef:
+                  key: MOVE_SPAM_TO_JUNK
+                  name: mailserver-env
+            - name: NETWORK_INTERFACE
+              valueFrom:
+                configMapKeyRef:
+                  key: NETWORK_INTERFACE
+                  name: mailserver-env
+            - name: ONE_DIR
+              valueFrom:
+                configMapKeyRef:
+                  key: ONE_DIR
+                  name: mailserver-env
+            - name: OVERRIDE_HOSTNAME
+              valueFrom:
+                configMapKeyRef:
+                  key: OVERRIDE_HOSTNAME
+                  name: mailserver-env
+            - name: PERMIT_DOCKER
+              valueFrom:
+                configMapKeyRef:
+                  key: PERMIT_DOCKER
+                  name: mailserver-env
+            - name: PFLOGSUMM_RECIPIENT
+              valueFrom:
+                configMapKeyRef:
+                  key: PFLOGSUMM_RECIPIENT
+                  name: mailserver-env
+            - name: PFLOGSUMM_SENDER
+              valueFrom:
+                configMapKeyRef:
+                  key: PFLOGSUMM_SENDER
+                  name: mailserver-env
+            - name: PFLOGSUMM_TRIGGER
+              valueFrom:
+                configMapKeyRef:
+                  key: PFLOGSUMM_TRIGGER
+                  name: mailserver-env
+            - name: POSTFIX_DAGENT
+              valueFrom:
+                configMapKeyRef:
+                  key: POSTFIX_DAGENT
+                  name: mailserver-env
+            - name: POSTFIX_INET_PROTOCOLS
+              valueFrom:
+                configMapKeyRef:
+                  key: POSTFIX_INET_PROTOCOLS
+                  name: mailserver-env
+            - name: POSTFIX_MAILBOX_SIZE_LIMIT
+              valueFrom:
+                configMapKeyRef:
+                  key: POSTFIX_MAILBOX_SIZE_LIMIT
+                  name: mailserver-env
+            - name: POSTFIX_MESSAGE_SIZE_LIMIT
+              valueFrom:
+                configMapKeyRef:
+                  key: POSTFIX_MESSAGE_SIZE_LIMIT
+                  name: mailserver-env
+            - name: POSTGREY_AUTO_WHITELIST_CLIENTS
+              valueFrom:
+                configMapKeyRef:
+                  key: POSTGREY_AUTO_WHITELIST_CLIENTS
+                  name: mailserver-env
+            - name: POSTGREY_DELAY
+              valueFrom:
+                configMapKeyRef:
+                  key: POSTGREY_DELAY
+                  name: mailserver-env
+            - name: POSTGREY_MAX_AGE
+              valueFrom:
+                configMapKeyRef:
+                  key: POSTGREY_MAX_AGE
+                  name: mailserver-env
+            - name: POSTGREY_TEXT
+              valueFrom:
+                configMapKeyRef:
+                  key: POSTGREY_TEXT
+                  name: mailserver-env
+            - name: POSTMASTER_ADDRESS
+              valueFrom:
+                configMapKeyRef:
+                  key: POSTMASTER_ADDRESS
+                  name: mailserver-env
+            - name: POSTSCREEN_ACTION
+              valueFrom:
+                configMapKeyRef:
+                  key: POSTSCREEN_ACTION
+                  name: mailserver-env
+            - name: RELAY_HOST
+              valueFrom:
+                configMapKeyRef:
+                  key: RELAY_HOST
+                  name: mailserver-env
+            - name: RELAY_PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  key: RELAY_PASSWORD
+                  name: mailserver-env
+            - name: RELAY_PORT
+              valueFrom:
+                configMapKeyRef:
+                  key: RELAY_PORT
+                  name: mailserver-env
+            - name: RELAY_USER
+              valueFrom:
+                configMapKeyRef:
+                  key: RELAY_USER
+                  name: mailserver-env
+            - name: REPORT_INTERVAL
+              valueFrom:
+                configMapKeyRef:
+                  key: REPORT_INTERVAL
+                  name: mailserver-env
+            - name: REPORT_RECIPIENT
+              valueFrom:
+                configMapKeyRef:
+                  key: REPORT_RECIPIENT
+                  name: mailserver-env
+            - name: REPORT_SENDER
+              valueFrom:
+                configMapKeyRef:
+                  key: REPORT_SENDER
+                  name: mailserver-env
+            - name: SASLAUTHD_LDAP_AUTH_METHOD
+              valueFrom:
+                configMapKeyRef:
+                  key: SASLAUTHD_LDAP_AUTH_METHOD
+                  name: mailserver-env
+            - name: SASLAUTHD_LDAP_BIND_DN
+              valueFrom:
+                configMapKeyRef:
+                  key: SASLAUTHD_LDAP_BIND_DN
+                  name: mailserver-env
+            - name: SASLAUTHD_LDAP_FILTER
+              valueFrom:
+                configMapKeyRef:
+                  key: SASLAUTHD_LDAP_FILTER
+                  name: mailserver-env
+            - name: SASLAUTHD_LDAP_MECH
+              valueFrom:
+                configMapKeyRef:
+                  key: SASLAUTHD_LDAP_MECH
+                  name: mailserver-env
+            - name: SASLAUTHD_LDAP_PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  key: SASLAUTHD_LDAP_PASSWORD
+                  name: mailserver-env
+            - name: SASLAUTHD_LDAP_PASSWORD_ATTR
+              valueFrom:
+                configMapKeyRef:
+                  key: SASLAUTHD_LDAP_PASSWORD_ATTR
+                  name: mailserver-env
+            - name: SASLAUTHD_LDAP_SEARCH_BASE
+              valueFrom:
+                configMapKeyRef:
+                  key: SASLAUTHD_LDAP_SEARCH_BASE
+                  name: mailserver-env
+            - name: SASLAUTHD_LDAP_SERVER
+              valueFrom:
+                configMapKeyRef:
+                  key: SASLAUTHD_LDAP_SERVER
+                  name: mailserver-env
+            - name: SASLAUTHD_LDAP_START_TLS
+              valueFrom:
+                configMapKeyRef:
+                  key: SASLAUTHD_LDAP_START_TLS
+                  name: mailserver-env
+            - name: SASLAUTHD_LDAP_TLS_CACERT_DIR
+              valueFrom:
+                configMapKeyRef:
+                  key: SASLAUTHD_LDAP_TLS_CACERT_DIR
+                  name: mailserver-env
+            - name: SASLAUTHD_LDAP_TLS_CACERT_FILE
+              valueFrom:
+                configMapKeyRef:
+                  key: SASLAUTHD_LDAP_TLS_CACERT_FILE
+                  name: mailserver-env
+            - name: SASLAUTHD_LDAP_TLS_CHECK_PEER
+              valueFrom:
+                configMapKeyRef:
+                  key: SASLAUTHD_LDAP_TLS_CHECK_PEER
+                  name: mailserver-env
+            - name: SASLAUTHD_MECHANISMS
+              valueFrom:
+                configMapKeyRef:
+                  key: SASLAUTHD_MECHANISMS
+                  name: mailserver-env
+            - name: SASLAUTHD_MECH_OPTIONS
+              valueFrom:
+                configMapKeyRef:
+                  key: SASLAUTHD_MECH_OPTIONS
+                  name: mailserver-env
+            - name: SASL_PASSWD
+              valueFrom:
+                configMapKeyRef:
+                  key: SASL_PASSWD
+                  name: mailserver-env
+            - name: SA_KILL
+              valueFrom:
+                configMapKeyRef:
+                  key: SA_KILL
+                  name: mailserver-env
+            - name: SA_SPAM_SUBJECT
+              valueFrom:
+                configMapKeyRef:
+                  key: SA_SPAM_SUBJECT
+                  name: mailserver-env
+            - name: SA_TAG
+              valueFrom:
+                configMapKeyRef:
+                  key: SA_TAG
+                  name: mailserver-env
+            - name: SA_TAG2
+              valueFrom:
+                configMapKeyRef:
+                  key: SA_TAG2
+                  name: mailserver-env
+            - name: SMTP_ONLY
+              valueFrom:
+                configMapKeyRef:
+                  key: SMTP_ONLY
+                  name: mailserver-env
+            - name: SPAMASSASSIN_SPAM_TO_INBOX
+              valueFrom:
+                configMapKeyRef:
+                  key: SPAMASSASSIN_SPAM_TO_INBOX
+                  name: mailserver-env
+            - name: SPOOF_PROTECTION
+              valueFrom:
+                configMapKeyRef:
+                  key: SPOOF_PROTECTION
+                  name: mailserver-env
+            - name: SRS_EXCLUDE_DOMAINS
+              valueFrom:
+                configMapKeyRef:
+                  key: SRS_EXCLUDE_DOMAINS
+                  name: mailserver-env
+            - name: SRS_SECRET
+              valueFrom:
+                configMapKeyRef:
+                  key: SRS_SECRET
+                  name: mailserver-env
+            - name: SRS_SENDER_CLASSES
+              valueFrom:
+                configMapKeyRef:
+                  key: SRS_SENDER_CLASSES
+                  name: mailserver-env
+            - name: SSL_ALT_CERT_PATH
+              valueFrom:
+                configMapKeyRef:
+                  key: SSL_ALT_CERT_PATH
+                  name: mailserver-env
+            - name: SSL_ALT_KEY_PATH
+              valueFrom:
+                configMapKeyRef:
+                  key: SSL_ALT_KEY_PATH
+                  name: mailserver-env
+            - name: SSL_CERT_PATH
+              valueFrom:
+                configMapKeyRef:
+                  key: SSL_CERT_PATH
+                  name: mailserver-env
+            - name: SSL_KEY_PATH
+              valueFrom:
+                configMapKeyRef:
+                  key: SSL_KEY_PATH
+                  name: mailserver-env
+            - name: SSL_TYPE
+              valueFrom:
+                configMapKeyRef:
+                  key: SSL_TYPE
+                  name: mailserver-env
+            - name: SUPERVISOR_LOGLEVEL
+              valueFrom:
+                configMapKeyRef:
+                  key: SUPERVISOR_LOGLEVEL
+                  name: mailserver-env
+            - name: TLS_LEVEL
+              valueFrom:
+                configMapKeyRef:
+                  key: TLS_LEVEL
+                  name: mailserver-env
+            - name: UPDATE_CHECK_INTERVAL
+              valueFrom:
+                configMapKeyRef:
+                  key: UPDATE_CHECK_INTERVAL
+                  name: mailserver-env
+            - name: VIRUSMAILS_DELETE_DELAY
+              valueFrom:
+                configMapKeyRef:
+                  key: VIRUSMAILS_DELETE_DELAY
+                  name: mailserver-env
+          image: docker.io/mailserver/docker-mailserver:latest
+          name: mailserver
+          ports:
+            - containerPort: 25
+            - containerPort: 143
+            - containerPort: 465
+            - containerPort: 587
+            - containerPort: 993
+          resources: {}
+          securityContext:
+            capabilities:
+              add:
+                - NET_ADMIN
+                - SYS_PTRACE
+          volumeMounts:
+            - mountPath: /var/mail
+              name: var-mail
+            - mountPath: /var/mail-state
+              name: var-mail-state
+            - mountPath: /var/log/mail
+              name: log-mail
+              #- mountPath: /etc/localtime
+              #name: localtime
+              #readOnly: true
+            - mountPath: /tmp/docker-mailserver/
+              name: tmp
+      hostname: mail
+      restartPolicy: Always
+      subdomain: rehl
+      terminationGracePeriodSeconds: 60
+      volumes:
+        - name: var-mail
+          persistentVolumeClaim:
+            claimName: var-mail
+        - name: var-mail-state
+          persistentVolumeClaim:
+            claimName: var-mail-state
+        - name: log-mail
+          persistentVolumeClaim:
+            claimName: log-mail
+        - name: localtime
+          persistentVolumeClaim:
+            claimName: localtime
+            readOnly: true
+        - name: tmp
+          persistentVolumeClaim:
+            claimName: tmp
+status: {}
